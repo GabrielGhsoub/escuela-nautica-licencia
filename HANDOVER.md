@@ -23,28 +23,38 @@ Public side, three steps in Spanish (tú form), with an EN toggle:
    día del curso trae tu DNI, NIE o pasaporte y el certificado psicotécnico."
    No upload, no photo.
 3. Reserva de plaza, 19 €. A simulated checkout: card (number, expiry, CVC,
-   name, with masks) or Bizum (phone). The two amounts are shown as two
-   facts: "Reserva de plaza 19 €, se paga ahora" and "Precio del curso 99 €,
-   información". One discreet line says the payment is simulated.
+   name, with masks) or Bizum (phone). The amounts are shown as a
+   breakdown: "Señal 19 €, se paga ahora, a cuenta de los 99 €", "Resto en el
+   barco 80 €, el día de la práctica, en efectivo o Bizum" and "Total del
+   curso 99 €, señal incluida". The intro block above the steps shows the
+   same three figures. One discreet line says the payment is simulated.
 
 Done screen: summary (day, hours, place, name, ID masked to the last three
-characters plus the letter, email), a "pagado 19 € (simulado)" chip, and the
-two emails the real version would send, rendered inline: the receipt to the
-student and the notice to info@escuelanauticadevalencia.es, labelled as
-"así llegarían en la versión real". Nothing is sent. A link opens the panel.
+characters plus the letter, email, "Pendiente: 80 € en el barco el día de la
+práctica (efectivo o Bizum)", "Total del curso: 99 €"), a "señal de 19 €
+pagada (simulado)" chip, and the two emails the real version would send,
+rendered inline: the receipt to the student (señal pagada 19 €, resto 80 € a
+pagar en el barco el día de la práctica en efectivo o Bizum, total 99 €) and
+the notice to info@escuelanauticadevalencia.es (señal cobrada 19 €, pendiente
+en el barco 80 €), labelled as "así llegarían en la versión real". Nothing is
+sent. A link opens the panel.
 
 Owner side (#admin):
 
 - Reservas: bookings grouped by day with full name, full ID number, email,
-  phone, a paid chip (19 €, card or Bizum), status chips (confirmada,
+  phone, a paid chip ("señal 19 € pagada", card or Bizum), a "80 €
+  pendientes en el barco" tag while the booking is confirmada (it goes once
+  the booking is marked asistió or cancelada), status chips (confirmada,
   asistió, cancelada) with one tap actions. The visitor's own booking is
   tagged "tuya"; seeded ones are tagged "ejemplo".
 - Días disponibles: a month grid where a tap selects a day; from there the
   owner opens or closes it and sets its seats (default 5, range 1 to 12).
   The public calendar reads the same data, so closing a day removes it from
   what the student sees, and a cancelled booking gives its seat back.
-- Stats: plazas vendidas este mes, próximos días con plazas, ingresos de
-  reservas este mes (19 € per non cancelled booking).
+- Stats: plazas vendidas este mes, próximos días con plazas, señales
+  cobradas este mes (19 € per non cancelled booking), pendiente en el barco
+  este mes (80 € per booking still confirmada, that is neither cancelled nor
+  marked asistió).
 
 All state lives in the browser tab (sessionStorage) and dies with it. Each
 visitor sees their own copy; nobody else sees what anyone types.
@@ -53,8 +63,14 @@ visitor sees their own copy; nobody else sees what anyone types.
 
 - 19 € is Dani's own number for the reservation (WhatsApp, 7 Oct 2026).
 - 99 € is the course price on his page (150 € shown struck through, as on his
-  page). The demo never says what happens with the difference between 19 €
-  and 99 €, because that is not published.
+  page).
+- The 80 € balance is Dani's own stated fact (WhatsApp, 8 Oct 2026): "Sí, son
+  una señal (a modo de reserva) a cuenta de los 99€, así abonan el resto
+  (80€) en el barco el día de la práctica en efectivo o Bizum". So the 19 € is
+  a señal paid online and counted toward the 99 €; the remaining 80 € is paid
+  on the boat on the practice day, in cash or Bizum. In the code the balance
+  is derived (price minus deposit), so 19 + 80 = 99 holds everywhere a figure
+  is computed; the prose strings in src/i18n.js state the same numbers.
 - 5 seats per day comes from the boat maximum quoted in the brief ("máximo 5
   tripulantes más un Patrón Profesional"). I could not find that sentence on
   the pages I fetched tonight (home, Licencia, nosotros, prácticas, alquiler),
@@ -98,9 +114,9 @@ visitor sees their own copy; nobody else sees what anyone types.
   (a retention period, for example until the course day plus whatever his
   records need). The panel shows the full number because the school needs it
   to issue the licence; the student's receipt shows it masked.
-- His confirmation of the 19 € rule: whether it is part of the 99 € or
-  separate, and what his policy says when someone cancels. The page will
-  state exactly what he publishes and nothing more.
+- What his policy says when someone cancels (the 19 € rule itself is now
+  confirmed: a señal counted toward the 99 €). The page will state exactly
+  what he publishes and nothing more.
 - A list of the days he wants open each month and the seats per day; the
   panel gives him the tool to maintain it himself.
 
