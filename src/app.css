@@ -121,10 +121,11 @@ h2:focus, .ask:focus { outline: none; }
 .done__admin a { color: var(--navy); font-weight: 600; text-decoration: underline; }
 
 /* --- Panel de la escuela --- */
-.adm__stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: .8rem; margin-top: 1.6rem; }
+.adm__stats { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: .8rem; margin-top: 1.6rem; }
 .adm__stat { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: .9rem 1.1rem; animation: card-in .4s cubic-bezier(.22,1,.36,1) backwards; }
 .adm__stat:nth-child(2) { animation-delay: .05s; }
 .adm__stat:nth-child(3) { animation-delay: .1s; }
+.adm__stat:nth-child(4) { animation-delay: .15s; }
 .adm__stat strong { display: block; font-family: var(--display); font-size: 1.7rem; color: var(--navy); }
 .adm__stat span { font-size: .82rem; color: var(--ink-soft); }
 .adm__panel { margin-top: 1.2rem; }
@@ -146,7 +147,7 @@ h2:focus, .ask:focus { outline: none; }
 .page .adm__act { min-height: 40px; padding: .5rem 1rem; font-size: .85rem; }
 .adm__empty { color: var(--ink-soft); }
 .adm__note { font-size: .84rem; color: var(--ink-soft); margin: 1.2rem 0 0; border-left: 3px solid var(--blue); padding-left: .8rem; }
-@media (max-width: 560px) { .adm__stats { gap: .5rem; } .adm__stat { padding: .7rem .8rem; } .adm__row { align-items: flex-start; } }
+@media (max-width: 560px) { .adm__stats { gap: .5rem; grid-template-columns: repeat(2, minmax(0,1fr)); } .adm__stat { padding: .7rem .8rem; } .adm__row { align-items: flex-start; } }
 
 /* --- Fields: one component, floating label, live tick --- */
 .fld { margin-bottom: 1.15rem; }
@@ -282,6 +283,7 @@ h2:focus, .ask:focus { outline: none; }
 .fact > span { font-size: .78rem; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
 .fact strong { font-family: var(--display); font-size: 1.45rem; color: var(--navy); }
 .fact s { font-size: .85rem; color: var(--ink-soft); font-weight: 500; margin-left: .3rem; }
+.fact small { font-size: .82rem; color: var(--ink-soft); line-height: 1.35; }
 .fact--list { grid-column: 1 / -1; }
 .fact--list ul { margin: .2rem 0 0; padding-left: 1.1rem; font-size: .88rem; color: var(--ink-soft); columns: 2; column-gap: 1.4rem; }
 .fact--list li { break-inside: avoid; margin-bottom: .15rem; }

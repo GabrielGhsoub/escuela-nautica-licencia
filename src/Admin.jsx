@@ -37,6 +37,9 @@ export default function Admin() {
   const sold = rows.filter((b) => monthKey(b.day) === thisMonth && takesSeat(b)).length
   const upcoming = Object.keys(days).filter((iso) => days[iso].open && !isPast(iso) && seatsFor(iso) > 0).length
   const income = sold * course.deposit
+  /* Balance still to collect on the boat: this month's bookings that are
+     neither cancelled nor marked attended, 80 € each. */
+  const pending = rows.filter((b) => monthKey(b.day) === thisMonth && b.status === 'confirmada').length * course.balance
 
   const grouped = useMemo(() => {
     const by = {}
@@ -96,6 +99,10 @@ export default function Admin() {
             <strong>{income} €</strong>
             <span>{t('admin.statIncome')}</span>
           </div>
+          <div className="adm__stat">
+            <strong>{pending} €</strong>
+            <span>{t('admin.statPending')}</span>
+          </div>
         </div>
 
         <div className="tabs tabs--adm" role="tablist">
@@ -133,6 +140,7 @@ export default function Admin() {
                         <div className="adm__meta">
                           <time dateTime={new Date(r.ts).toISOString()}>{fmtTime.format(r.ts)}</time>
                           <span className="chip chip--paid">{t('admin.paid')} · {t(`done.method.${r.method}`)}</span>
+                          {r.status === 'confirmada' && <span className="adm__tag">{t('admin.pending')}</span>}
                           {r.mine && <span className="adm__tag adm__tag--mine">{t('admin.tagMine')}</span>}
                           {r.example && <span className="adm__tag">{t('admin.tagExample')}</span>}
                           <span className={`adm__chip adm__chip--${r.status}`}>{t(`status.${r.status}`)}</span>

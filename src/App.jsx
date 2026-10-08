@@ -9,9 +9,13 @@
    Deliberately NOT here:
    - No document upload and no photo of anything. He re-read the rules on
      7 Oct: the number has to be provided, the photo does not.
-   - No statement about the 80 € between the 19 € reservation and the 99 €
-     course. He has not published what happens with it, so the page shows the
-     two amounts as two facts and nothing more.
+   - Nothing about the money beyond what Dani said himself. Until 8 Oct the
+     page showed 19 € and 99 € as two separate facts, because the 80 € between
+     them was unknown. On 8 Oct he stated it on WhatsApp, in his words: "Sí,
+     son una señal (a modo de reserva) a cuenta de los 99€, así abonan el
+     resto (80€) en el barco el día de la práctica en efectivo o Bizum". So the
+     page now shows the breakdown: 19 € señal paid online now, 80 € paid on
+     the boat on the practice day in cash or Bizum, 99 € in total.
    - No cancellation rule, refund rule or confirmation time of our own. The
      checkbox links to his published policy and says nothing beyond it.
    - No real charge. The card and Bizum forms are simulated and say so once.
@@ -291,10 +295,17 @@ export default function App() {
               <div className="fact">
                 <span>{t('intro.deposit')}</span>
                 <strong>{eur(course.deposit)}</strong>
+                <small>{t('intro.depositNote')}</small>
+              </div>
+              <div className="fact">
+                <span>{t('intro.balance')}</span>
+                <strong>{eur(course.balance)}</strong>
+                <small>{t('intro.balanceNote')}</small>
               </div>
               <div className="fact">
                 <span>{t('intro.price')}</span>
                 <strong>{eur(course.price)} <s>{eur(course.priceBefore)}</s></strong>
+                <small>{t('intro.priceNote')}</small>
               </div>
               <div className="fact fact--list">
                 <span>{t('intro.reqs')}</span>
@@ -330,6 +341,8 @@ export default function App() {
                     [t('done.name'), fullName],
                     [t('done.id'), maskId(form.documento)],
                     [t('done.email'), form.email],
+                    [t('done.pending'), t('done.pendingValue')],
+                    [t('done.total'), eur(course.price)],
                   ].map(([k, v]) => (
                     <div key={k}><dt>{k}</dt><dd>{v}</dd></div>
                   ))}
@@ -355,7 +368,11 @@ export default function App() {
                       <li><strong>{t('done.name')}:</strong> {fullName}</li>
                       <li><strong>{t('done.id')}:</strong> {maskId(form.documento)}</li>
                     </ul>
-                    <p>{t('mail.s.price')}</p>
+                    <ul>
+                      <li><strong>{t('mail.s.paid')}:</strong> {eur(course.deposit)}</li>
+                      <li><strong>{t('mail.s.balance')}:</strong> {eur(course.balance)}, {t('mail.s.balanceValue')}</li>
+                      <li><strong>{t('mail.s.total')}:</strong> {eur(course.price)}</li>
+                    </ul>
                     <p>{t('mail.s.bring')}</p>
                     <p>{t('mail.s.contact')}{school.phone}.</p>
                     <p>{t('mail.s.sign')}</p>
@@ -373,6 +390,7 @@ export default function App() {
                       <li><strong>{t('done.email')}:</strong> {form.email}</li>
                       <li><strong>{t('mail.k.phone')}:</strong> {telShown || t('mail.k.noPhone')}</li>
                       <li><strong>{t('mail.k.method')}:</strong> {t(`done.method.${pay.method}`)}{pay.method === 'tarjeta' && pay.number ? ` ···· ${last4(pay.number)}` : ''}, {eur(course.deposit)}</li>
+                      <li><strong>{t('mail.k.pending')}:</strong> {eur(course.balance)}, {t('mail.k.pendingValue')}</li>
                       <li><strong>{t('mail.k.seats')}:</strong> {seatsAfter} {t('admin.of')} {days[day]?.seats ?? course.capacity}</li>
                     </ul>
                   </MailPreview>
@@ -611,6 +629,10 @@ export default function App() {
                           <div className="amounts__now">
                             <dt>{t('pay.deposit')} <small>{t('pay.depositNote')}</small></dt>
                             <dd>{eur(course.deposit)}</dd>
+                          </div>
+                          <div>
+                            <dt>{t('pay.balance')} <small>{t('pay.balanceNote')}</small></dt>
+                            <dd>{eur(course.balance)}</dd>
                           </div>
                           <div>
                             <dt>{t('pay.course')} <small>{t('pay.courseNote')}</small></dt>

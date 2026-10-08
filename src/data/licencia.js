@@ -22,10 +22,15 @@ export const course = {
   /* "PRECIO 150€ 99€" on his page: 99 is the price, 150 is struck through. */
   price: 99,
   priceBefore: 150,
-  /* 19 is the owner's own number, given on WhatsApp on 2026-10-07. The page
-     never says what happens with the difference to 99, because he has not
-     published that. */
+  /* 19 is the owner's own number, given on WhatsApp on 2026-10-07. On
+     2026-10-08 he stated what it is, in his words: "Sí, son una señal (a modo
+     de reserva) a cuenta de los 99€, así abonan el resto (80€) en el barco el
+     día de la práctica en efectivo o Bizum". So 19 is a deposit paid online and
+     counted toward the 99; the balance is paid on the boat on the day. */
   deposit: 19,
+  /* The balance, paid on the boat on the practice day, cash or Bizum. Derived
+     so that deposit + balance always equals the price (19 + 80 = 99). */
+  get balance() { return this.price - this.deposit },
   hours: 'de 9 a 13 h',
   place: 'Marina Port Valencia',
   /* Capacity per day. Five is the boat maximum quoted from his site in the
