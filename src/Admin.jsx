@@ -5,7 +5,8 @@
    read from the same place, so a change here is a change there. Everything is
    simulated in the visitor's own browser and says so. */
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { course, school } from './data/licencia.js'
+import { brand, course, school } from './data/licencia.js'
+import { formatName } from './masks.js'
 import { loadBookings, loadDays, seatsLeft, setDay, setStatus, takesSeat } from './store.js'
 import { isPast, longDay, monthKey, monthName, todayIso } from './dates.js'
 import DayCalendar from './components/DayCalendar.jsx'
@@ -67,11 +68,8 @@ export default function Admin() {
       <header className="top">
         <div className="shell top__in">
           <div className="top__brand">
-            <span className="top__mark" aria-hidden="true">⚓</span>
-            <span>
-              <strong>{school.name}</strong>
-              <em>{t('admin.tagline')}</em>
-            </span>
+            <img className="top__logo" src={brand.logo} alt={school.name} width={brand.logoWidth} height={brand.logoHeight} />
+            <em>{t('admin.tagline')}</em>
           </div>
           <div className="top__side">
             <a className="top__phone" href="#">{t('admin.back')}</a>
@@ -130,7 +128,7 @@ export default function Admin() {
                     {list.map((r, i) => (
                       <li key={r.id} className={`adm__row${r.mine ? ' is-mine' : ''}${r.status === 'cancelada' ? ' is-off' : ''}`} style={{ '--i': i }}>
                         <div className="adm__who">
-                          <strong>{r.nombre} {r.apellidos}</strong>
+                          <strong>{formatName(`${r.nombre} ${r.apellidos}`)}</strong>
                           <span className="adm__doc">{r.documento}</span>
                           <span className="adm__contact">
                             <a href={`mailto:${r.email}`}>{r.email}</a>

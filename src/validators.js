@@ -42,14 +42,20 @@ export function idCheck(v) {
 
 export const idOk = (v) => idCheck(v).ok;
 
-/* Optional: blank is fine, anything typed has to be a real number somewhere. */
+/* Required since 2026-10-09: Dani sends the exact meeting point and the
+   theory material by phone, so a booking without one is no use to him. The
+   rule is plausibility, not a registry lookup: an optional + and 9 to 15
+   digits once spaces, dots, brackets and dashes are removed. A Spanish
+   number is 9 digits; the control prefixes the dial code, so +34 plus 9
+   digits passes and a bare dial code ("+34") does not. Where libphonenumber
+   recognises the number it must also be a possible length for its country. */
 export const telOk = (v) => {
-  const s = String(v).trim();
-  if (!s || /^\+\d{1,3}$/.test(s)) return true;
+  const s = String(v).trim().replace(/[\s().-]/g, '');
+  if (!/^\+?\d{9,15}$/.test(s)) return false;
   try {
     const p = parsePhoneNumberFromString(s, 'ES');
-    return Boolean(p && p.isValid());
-  } catch { return false; }
+    return p ? p.isPossible() : true;
+  } catch { return true; }
 };
 
 const HTML5_EMAIL =

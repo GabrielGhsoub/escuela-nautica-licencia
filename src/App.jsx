@@ -20,17 +20,19 @@
      checkbox links to his published policy and says nothing beyond it.
    - No real charge. The card and Bizum forms are simulated and say so once.
 
-   Email and phone are additions to his three fields, because a receipt and a
-   same day notice need somewhere to go. */
+   Email and phone are additions to his three fields. Email because the
+   receipt needs somewhere to go; phone because, in his words on 9 Oct, "a
+   través del teléfono les puedo mandar la ubicación de donde estamos
+   exactamente y también les envío la parte de teoría", so it is required. */
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, LazyMotion, MotionConfig, domAnimation } from 'motion/react'
 import * as m from 'motion/react-m'
 import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone'
 import 'react-international-phone/style.css'
-import { course, school } from './data/licencia.js'
+import { brand, course, school } from './data/licencia.js'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 import { apellidosOk, cardCvcOk, cardExpiryOk, cardNumberOk, emailOk, idCheck, nombreOk, telOk } from './validators.js'
-import { formatCardNumber, formatCvc, formatExpiry, formatId, last4, maskId, prettyTel } from './masks.js'
+import { formatCardNumber, formatCvc, formatExpiry, formatId, formatName, last4, maskId, prettyTel } from './masks.js'
 import { loadBookings, loadDays, seatsLeft, upsertBooking } from './store.js'
 import { isPast, longDay, monthKey, monthName, todayIso } from './dates.js'
 import Field from './components/Field.jsx'
@@ -136,7 +138,9 @@ export default function App() {
     telefono: checks.telefono ? '' : t('err.telefono'),
     policy: checks.policy ? '' : t('err.policy'),
   }
-  const REQUIRED = ['nombre', 'apellidos', 'documento', 'email']
+  /* Phone joined the required set on 2026-10-09: Dani sends the meeting
+     point and the theory material through it. */
+  const REQUIRED = ['nombre', 'apellidos', 'documento', 'email', 'telefono']
   const filled = REQUIRED.filter((k) => checks[k]).length
   const progress = Math.round((filled / REQUIRED.length) * 100)
 
@@ -175,7 +179,8 @@ export default function App() {
       const next = { ...f }
       for (const k of ['nombre', 'apellidos', 'email']) {
         const el = inputs.current[k]
-        if (el?.value && el.value !== f[k]) { next[k] = el.value; changed = true }
+        const v = k === 'email' ? el?.value : formatName(el?.value)
+        if (el?.value && v !== f[k]) { next[k] = v; changed = true }
       }
       return changed ? next : f
     }), 400)
@@ -225,8 +230,8 @@ export default function App() {
     filedRef.current = true
     filedIdRef.current = upsertBooking(filedIdRef.current, {
       day,
-      nombre: form.nombre.trim(),
-      apellidos: form.apellidos.trim(),
+      nombre: formatName(form.nombre.trim()),
+      apellidos: formatName(form.apellidos.trim()),
       documento: form.documento,
       email: form.email.trim(),
       telefono: prettyTel(form.telefono) ? (form.telDisplay || prettyTel(form.telefono)) : '',
@@ -259,7 +264,7 @@ export default function App() {
   const monthDays = Object.keys(days)
     .filter((iso) => monthKey(iso) === month && days[iso].open && !isPast(iso))
     .sort()
-  const fullName = `${form.nombre.trim()} ${form.apellidos.trim()}`.trim()
+  const fullName = formatName(`${form.nombre.trim()} ${form.apellidos.trim()}`.trim())
   /* The phone control always shows a dial code, so "+34" alone is "no phone". */
   const telShown = prettyTel(form.telefono) ? (form.telDisplay || prettyTel(form.telefono)) : ''
   const seatsAfter = day ? seatsFor(day) : 0
@@ -272,11 +277,8 @@ export default function App() {
         <header className="top">
           <div className="shell top__in">
             <div className="top__brand">
-              <span className="top__mark" aria-hidden="true">⚓</span>
-              <span>
-                <strong>{school.name}</strong>
-                <em>{t('top.tagline')}</em>
-              </span>
+              <img className="top__logo" src={brand.logo} alt={school.name} width={brand.logoWidth} height={brand.logoHeight} />
+              <em>{t('top.tagline')}</em>
             </div>
             <div className="top__side">
               <a className="top__phone" href={school.phoneHref} aria-label={`${t('top.callAria')} ${school.phone}`}>
@@ -301,11 +303,6 @@ export default function App() {
                 <span>{t('intro.balance')}</span>
                 <strong>{eur(course.balance)}</strong>
                 <small>{t('intro.balanceNote')}</small>
-              </div>
-              <div className="fact">
-                <span>{t('intro.price')}</span>
-                <strong>{eur(course.price)} <s>{eur(course.priceBefore)}</s></strong>
-                <small>{t('intro.priceNote')}</small>
               </div>
               <div className="fact fact--list">
                 <span>{t('intro.reqs')}</span>
@@ -359,7 +356,7 @@ export default function App() {
                     from={school.email} to={form.email}
                     subject={`${t('mail.s.subject')}${longDay(day, lang)}`}
                   >
-                    <p>{t('mail.s.hi')}{form.nombre.trim()},</p>
+                    <p>{t('mail.s.hi')}{formatName(form.nombre.trim())},</p>
                     <p>{t('mail.s.body1')}</p>
                     <ul>
                       <li><strong>{t('done.day')}:</strong> <span className="cap">{longDay(day, lang, true)}</span></li>
@@ -503,9 +500,9 @@ export default function App() {
                           value={form.nombre}
                           valid={checks.nombre}
                           error={errors.nombre} showError={showErr('nombre')}
-                          onChange={(e) => setForm({ ...form, nombre: e.target.value })}
+                          onChange={(e) => setForm({ ...form, nombre: formatName(e.target.value) })}
                           onBlur={blur('nombre')}
-                          name="nombre" autoComplete="given-name" autoCapitalize="words" enterKeyHint="next"
+                          name="nombre" autoComplete="given-name" autoCapitalize="characters" enterKeyHint="next"
                         />
                         <Field
                           id="apellidos" label={t('fld.apellidos.label')}
@@ -513,9 +510,9 @@ export default function App() {
                           value={form.apellidos}
                           valid={checks.apellidos}
                           error={errors.apellidos} showError={showErr('apellidos')}
-                          onChange={(e) => setForm({ ...form, apellidos: e.target.value })}
+                          onChange={(e) => setForm({ ...form, apellidos: formatName(e.target.value) })}
                           onBlur={blur('apellidos')}
-                          name="apellidos" autoComplete="family-name" autoCapitalize="words" enterKeyHint="next"
+                          name="apellidos" autoComplete="family-name" autoCapitalize="characters" enterKeyHint="next"
                         />
                         <Field
                           id="documento" label={t('fld.documento.label')}
@@ -540,7 +537,7 @@ export default function App() {
                         />
 
                         <Field
-                          id="telefono" label={t('fld.telefono.label')} hint={t('fld.telefono.hint')} alwaysFloat optional
+                          id="telefono" label={t('fld.telefono.label')} hint={t('fld.telefono.hint')} alwaysFloat
                           value={form.telefono}
                           valid={checks.telefono && Boolean(prettyTel(form.telefono))}
                           error={errors.telefono} showError={showErr('telefono')}

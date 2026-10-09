@@ -7,6 +7,14 @@ export function formatId(v) {
   return String(v).toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 12);
 }
 
+/* Nombre and Apellidos in capitals as they are typed (Dani, 2026-10-09): the
+   licence is issued from these fields and he wants them the way they appear
+   on the document. Accents survive: "núria" becomes "NÚRIA". Also applied
+   wherever a stored name is shown, so the example bookings read the same. */
+export function formatName(v) {
+  return String(v ?? '').toUpperCase();
+}
+
 /* Groups of four, up to 19 digits. */
 export function formatCardNumber(v) {
   const d = String(v).replace(/\D/g, '').slice(0, 19);
