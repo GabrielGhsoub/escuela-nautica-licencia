@@ -1,28 +1,81 @@
-/* Their two brand colours, sampled from the live site: the button blue
-   rgb(30,115,190) and the deep navy rgb(14,24,95). Everything else is a
-   neutral built around them, so the palette stays theirs. */
+/* Brand values: every one read from the school's own stylesheets on
+   2026-10-09, after Dani asked that the page use "la letra, tamaño y colores
+   de la web". Sources (both fetched with curl, the URLs as the home page
+   links them):
+
+   KIT  https://escuelanauticadevalencia.es/wp-content/uploads/elementor/css/post-33.css?ver=1791335683
+        (the Elementor global kit: colours, typography, buttons, inputs)
+   HOME https://escuelanauticadevalencia.es/wp-content/uploads/elementor/css/post-37.css?ver=1791336296
+   LIC  https://escuelanauticadevalencia.es/wp-content/uploads/elementor/css/post-1117.css?ver=1791342487
+        (the Licencia de Navegación page)
+   HDR  https://escuelanauticadevalencia.es/wp-content/uploads/elementor/css/post-408.css?ver=1791335684
+   THEME https://escuelanauticadevalencia.es/wp-content/themes/hello-elementor/style.min.css?ver=3.3.0
+   FONT https://fonts.googleapis.com/css?family=Montserrat:100,...,900italic&display=swap
+        (linked from index.html exactly as his site links it)
+
+   KIT  --e-global-color-primary    #2FA4FF  buttons, links            -> --blue
+   KIT  --e-global-color-secondary  #0E185F  button hover, dark bands  -> --navy
+   KIT  --e-global-color-accent     #0E185F  h1 to h6                  -> --navy
+   KIT  --e-global-color-text       #6E6E6E  body text                 -> --ink-soft
+   KIT  --e-global-color-2d6a869    #DADADA  input borders             -> --line
+   KIT  --e-global-color-6b0ce64    #F3F3F3  light grey bands          -> --sand
+   KIT  --e-global-color-f2e50b6    #EEF7FF73 light blue tint, used
+                                    here without its alpha             -> --foam
+   HOME background-color #000739    the darkest navy on the home page  -> --navy-deep
+   HDR  background-color #0E185F    the sticky header                  -> .top
+   THEME body background #fff, colour #333                             -> --white, body
+   LIC  color #000000               content text on the Licencia page  -> --ink
+   LIC  border-radius 7px           the only rounded corner he uses    -> --radius
+
+   KIT typography (all "Montserrat", Sans-serif):
+     text   18px / 1.5em                                  -> html font-size
+     h1     60px bold, 45px at <=1024px, 35px at <=767px  -> --h1
+     h2     45px bold, 35px, 25px                         -> --h2
+     h3     35px bold, 30px, 23px                         -> --h3
+     h4     25px bold, 23px, 20px                         -> --h4
+     h5     20px bold, 20px, 18px                         -> --h5
+     accent 12px bold uppercase, letter-spacing 2px,
+            line-height 1.3em                             -> buttons
+     buttons: background primary, border 2px primary, radius 0,
+              padding 17px 37px, white text; hover secondary
+     inputs:  border 2px #DADADA, radius 0, padding 17px 20px, 18px text
+   The kit also capitalises every word of h1 and h2; that is not copied,
+   the headings here read as sentences. */
 
 :root {
-  --navy: #0e185f;
-  --navy-deep: #080f3c;
-  --blue: #1e73be;
-  --blue-bright: #3b93e0;
-  --foam: #eef4fb;
-  --sand: #f7f5f1;
-  --ink: #10131f;
-  --ink-soft: #454a60;
-  --line: rgba(14, 24, 95, 0.12);
+  --navy: #0E185F;
+  --navy-deep: #000739;
+  --blue: #2FA4FF;
+  --blue-bright: #2FA4FF;
+  --foam: #EEF7FF;
+  --sand: #F3F3F3;
+  --ink: #000000;
+  --ink-soft: #6E6E6E;
+  --line: #DADADA;
   --white: #ffffff;
 
-  --display: 'Space Grotesk Variable', ui-sans-serif, system-ui, sans-serif;
-  --body: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --display: 'Montserrat', sans-serif;
+  --body: 'Montserrat', sans-serif;
 
-  --shell: min(1180px, 100% - 2.5rem);
-  --radius: 18px;
-  --radius-lg: 26px;
-  --shadow: 0 18px 48px -24px rgba(8, 15, 60, 0.4);
-  --shadow-lift: 0 30px 70px -30px rgba(8, 15, 60, 0.5);
+  --h1: 60px;
+  --h2: 45px;
+  --h3: 35px;
+  --h4: 25px;
+  --h5: 20px;
+
+  --shell: min(1140px, 100% - 2.5rem);
+  --radius: 7px;
+  --radius-lg: 7px;
+  --shadow: 0 18px 48px -24px rgba(14, 24, 95, 0.4);
+  --shadow-lift: 0 30px 70px -30px rgba(14, 24, 95, 0.5);
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (max-width: 1024px) {
+  :root { --h1: 45px; --h2: 35px; --h3: 30px; --h4: 23px; --h5: 20px; }
+}
+@media (max-width: 767px) {
+  :root { --h1: 35px; --h2: 25px; --h3: 23px; --h4: 20px; --h5: 18px; }
 }
 
 *,
@@ -34,15 +87,17 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
+  /* KIT text size: 18px. Every rem on the page hangs off it. */
+  font-size: 18px;
 }
 
 body {
   margin: 0;
   font-family: var(--body);
-  color: var(--ink);
+  color: var(--ink-soft);
   background: var(--white);
-  line-height: 1.65;
-  font-size: 17px;
+  line-height: 1.5;
+  font-size: 1rem;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -52,22 +107,17 @@ h3,
 h4 {
   font-family: var(--display);
   color: var(--navy);
-  line-height: 1.08;
-  letter-spacing: -0.022em;
+  line-height: 1.5;
+  letter-spacing: 0;
   margin: 0 0 0.6em;
-  font-weight: 600;
+  font-weight: 700;
   text-wrap: balance;
 }
 
-h1 {
-  font-size: clamp(2.4rem, 5.6vw, 4.15rem);
-}
-h2 {
-  font-size: clamp(1.85rem, 3.6vw, 2.75rem);
-}
-h3 {
-  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
-}
+h1 { font-size: var(--h1); }
+h2 { font-size: var(--h2); }
+h3 { font-size: var(--h3); }
+h4 { font-size: var(--h4); }
 
 p {
   margin: 0 0 1.1em;
@@ -104,36 +154,38 @@ img {
 
 .eyebrow {
   font-family: var(--display);
-  font-size: 0.76rem;
-  font-weight: 600;
-  letter-spacing: 0.18em;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--blue);
   margin: 0 0 1rem;
 }
 
 .lede {
-  font-size: clamp(1.05rem, 1.5vw, 1.22rem);
+  font-size: 1rem;
   max-width: 62ch;
   color: var(--ink-soft);
 }
 
-/* Buttons */
+/* Buttons: the kit's accent typography and geometry */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
   font-family: var(--display);
-  font-weight: 600;
-  font-size: 0.97rem;
-  letter-spacing: -0.01em;
-  padding: 0.95rem 1.7rem;
-  border-radius: 999px;
-  border: 1px solid transparent;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1.3;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 17px 37px;
+  border-radius: 0;
+  border: 2px solid transparent;
   cursor: pointer;
   transition: transform 0.25s var(--ease), background 0.25s var(--ease),
-    box-shadow 0.25s var(--ease), color 0.25s var(--ease);
+    box-shadow 0.25s var(--ease), color 0.25s var(--ease), border-color 0.25s var(--ease);
   text-align: center;
 }
 
@@ -143,22 +195,24 @@ img {
 
 .btn--primary {
   background: var(--blue);
+  border-color: var(--blue);
   color: var(--white);
-  box-shadow: 0 12px 28px -12px rgba(30, 115, 190, 0.75);
 }
 
 .btn--primary:hover {
-  background: var(--blue-bright);
-  box-shadow: 0 18px 36px -14px rgba(30, 115, 190, 0.85);
+  background: var(--navy);
+  border-color: var(--navy);
 }
 
 .btn--navy {
   background: var(--navy);
+  border-color: var(--navy);
   color: var(--white);
 }
 
 .btn--navy:hover {
   background: var(--navy-deep);
+  border-color: var(--navy-deep);
 }
 
 .btn--ghost {

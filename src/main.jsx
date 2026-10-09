@@ -4,7 +4,8 @@ import { createRoot } from 'react-dom/client'
    must land first. It used to be imported after App.jsx, which meant every
    shared class in app.css lost an equal-specificity tie to the template. That
    is how the "Atras" button ended up white on white. */
-import './fonts.css'
+/* Montserrat comes from Google Fonts through index.html, the way his own site
+   loads it; nothing is self-hosted any more. */
 import './theme.css'
 import App from './App.jsx'
 import { LangProvider } from './i18n.js'
