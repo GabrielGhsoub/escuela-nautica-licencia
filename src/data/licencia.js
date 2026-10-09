@@ -17,6 +17,17 @@ export const school = {
   policyUrl: 'https://escuelanauticadevalencia.es/politica-de-reservas-cambios-y-cancelaciones-de-practicas/',
 }
 
+/* His logo, the <img> his header shows on every page (read from the header
+   markup of escuelanauticadevalencia.es on 2026-10-09):
+   https://escuelanauticadevalencia.es/wp-content/uploads/2025/01/ESCUELA-NAU-e1739526451490.png
+   873 x 246, white wordmark with the coloured paper boat on a transparent
+   background, so it sits on navy. Copied unchanged into public/. */
+export const brand = {
+  logo: `${import.meta.env.BASE_URL}logo-escuela-nautica-valencia.png`,
+  logoWidth: 873,
+  logoHeight: 246,
+}
+
 export const course = {
   name: 'Licencia de Navegación',
   /* "PRECIO 150€ 99€" on his page: 99 is the price, 150 is struck through. */
@@ -53,11 +64,13 @@ export const publishedDays = [
   '2026-10-31',
 ]
 
-/* "Requisitos para la Licencia de Navegación", his list, verbatim. */
+/* "Requisitos para la Licencia de Navegación", his list, verbatim, with one
+   correction he asked for on 2026-10-09: the practice is "prácticas de
+   seguridad y navegación" (his page still says "prácticas de navegación"). */
 export const requirements = [
   'Ser mayor de 16 años (con autorización familiar)',
   'Realizar 2 horas de teoría (sin examen)',
-  'Completar 4 horas de prácticas de navegación',
+  'Completar 4 horas de prácticas de seguridad y navegación',
   'Presentar un certificado psicotécnico',
 ]
 

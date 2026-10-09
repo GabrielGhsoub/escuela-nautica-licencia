@@ -20,9 +20,7 @@ export const messages = {
     'top.callAria': 'Llamar al',
 
     'intro.h1': 'Reserva tu plaza para la Licencia de Navegación',
-    'intro.lede': 'Un día de curso en Marina Port Valencia, de 9 a 13 h: 2 horas de teoría sin examen y 4 horas de prácticas. Te llevas la licencia al terminar.',
-    'intro.price': 'Precio del curso',
-    'intro.priceNote': 'señal incluida: 19 € + 80 €',
+    'intro.lede': 'Tu licencia en una mañana en Marina Port Valencia, de 9 a 13h. Te llevas tu título al terminar.',
     'intro.deposit': 'Señal al reservar',
     'intro.depositNote': 'se paga ahora online, a cuenta de los 99 €',
     'intro.balance': 'Resto en el barco',
@@ -69,7 +67,7 @@ export const messages = {
     'fld.email.label': 'Correo electrónico',
     'fld.email.hint': 'Aquí te llegaría el justificante de la reserva.',
     'fld.telefono.label': 'Teléfono',
-    'fld.telefono.hint': 'Por si la escuela necesita avisarte de algo el mismo día.',
+    'fld.telefono.hint': 'Por teléfono te mandamos la ubicación exacta de donde estamos y la parte de teoría.',
     'fld.optional': 'opcional',
 
     'err.nombre': 'Escribe tu nombre.',
@@ -78,7 +76,7 @@ export const messages = {
     'err.documento.shape': 'Revisa el número: un DNI son 8 cifras y una letra, un NIE empieza por X, Y o Z, y un pasaporte tiene entre 6 y 12 letras o cifras.',
     'err.documento.letter': 'La letra final no coincide con las cifras. Revisa el número.',
     'err.email': 'Revisa el correo, parece que le falta algo (por ejemplo .com).',
-    'err.telefono': 'Ese teléfono no parece completo. Puedes dejarlo en blanco.',
+    'err.telefono': 'Escribe un teléfono válido: 9 cifras si es español, con el prefijo del país si no lo es.',
     'err.policy': 'Para reservar hay que aceptar la política de reservas.',
 
     'policy.pre': 'He leído y acepto la ',
@@ -223,9 +221,7 @@ export const messages = {
     'top.callAria': 'Call',
 
     'intro.h1': 'Book your seat for the Licencia de Navegación',
-    'intro.lede': 'One course day at Marina Port Valencia, 9 to 13 h: 2 hours of theory with no exam and 4 hours of practice. You take the licence home at the end.',
-    'intro.price': 'Course price',
-    'intro.priceNote': 'deposit included: 19 € + 80 €',
+    'intro.lede': 'Your licence in one morning at Marina Port Valencia, 9 to 13h. You take your certificate home when you finish.',
     'intro.deposit': 'Deposit at booking',
     'intro.depositNote': 'paid now online, part of the 99 €',
     'intro.balance': 'Balance on the boat',
@@ -234,7 +230,7 @@ export const messages = {
     'intro.reqList': [
       'Be over 16 (with family authorisation)',
       '2 hours of theory (no exam)',
-      '4 hours of practical navigation',
+      '4 hours of safety and navigation practice',
       'Present a medical certificate (certificado psicotécnico)',
     ],
 
@@ -277,7 +273,7 @@ export const messages = {
     'fld.email.label': 'Email',
     'fld.email.hint': 'This is where the booking receipt would arrive.',
     'fld.telefono.label': 'Phone',
-    'fld.telefono.hint': 'In case the school needs to reach you on the day.',
+    'fld.telefono.hint': 'By phone we send you the exact location where we are and the theory material.',
     'fld.optional': 'optional',
 
     'err.nombre': 'Write your first name.',
@@ -286,7 +282,7 @@ export const messages = {
     'err.documento.shape': 'Check the number: a DNI is 8 digits and a letter, a NIE starts with X, Y or Z, and a passport has 6 to 12 letters or digits.',
     'err.documento.letter': 'The final letter does not match the digits. Check the number.',
     'err.email': 'Check the email address, it looks like something is missing (for example .com).',
-    'err.telefono': 'That phone number does not look complete. You can leave it blank.',
+    'err.telefono': 'Write a valid phone number: 9 digits for a Spanish number, with the country code if it is not Spanish.',
     'err.policy': 'To book, the booking policy has to be accepted.',
 
     'policy.pre': 'I have read and accept the ',
