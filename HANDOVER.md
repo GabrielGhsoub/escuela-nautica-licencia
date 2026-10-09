@@ -16,7 +16,8 @@ Public side, three steps in Spanish (tú form), with an EN toggle:
    Valencia) and the seats left. Under the calendar: "Otras fechas: consulta
    por WhatsApp" linking to wa.me/34655487716. Months without dates say so.
 2. Tus datos. Nombre, Apellidos, Número de DNI/NIE o pasaporte, Correo
-   electrónico, Teléfono (opcional). The ID field uppercases as you type,
+   electrónico, Teléfono (required since 9 Oct, see below). Nombre and
+   Apellidos uppercase as you type. The ID field uppercases as you type,
    validates the DNI and NIE checksum letter, accepts a passport by shape
    (6 to 12 letters or digits) and tells you which format it recognised. One
    required checkbox linking to the published booking policy. One line: "El
@@ -27,7 +28,8 @@ Public side, three steps in Spanish (tú form), with an EN toggle:
    breakdown: "Señal 19 €, se paga ahora, a cuenta de los 99 €", "Resto en el
    barco 80 €, el día de la práctica, en efectivo o Bizum" and "Total del
    curso 99 €, señal incluida". The intro block above the steps shows the
-   same three figures. One discreet line says the payment is simulated.
+   señal and the balance (the "Precio del curso" box went on 9 Oct at his
+   request). One discreet line says the payment is simulated.
 
 Done screen: summary (day, hours, place, name, ID masked to the last three
 characters plus the letter, email, "Pendiente: 80 € en el barco el día de la
@@ -85,14 +87,16 @@ visitor sees their own copy; nobody else sees what anyone types.
   ".ejemplo@". They are labelled "ejemplo" in the panel.
 - Email and phone are additions to his three fields (name, surname, ID).
   Email is required because the receipt needs somewhere to go; phone is
-  optional, for a same day notice.
+  required since 9 Oct because, in his words, he sends the exact location
+  and the theory material through it.
 - The policy checkbox links to his footer page "Política de Reservas, Cambios
   y Cancelaciones":
   https://escuelanauticadevalencia.es/politica-de-reservas-cambios-y-cancelaciones-de-practicas/
   The demo states no policy of its own: no cancellation rule, no refund
   rule, no confirmation time.
 - The requirements list, the hours, the place, the "sin examen" and the
-  "te llevas la licencia al terminar" wording are from his Licencia page.
+  "te llevas la licencia al terminar" wording are from his Licencia page,
+  with his 9 Oct correction to the practice line (see below).
 - Payment is simulated. Any well formed card number or phone is accepted,
   nothing is checked against a network, nothing is stored beyond the form
   state in the tab, and no card brand is named (just "Tarjeta").
@@ -119,6 +123,108 @@ visitor sees their own copy; nobody else sees what anyone types.
   what he publishes and nothing more.
 - A list of the days he wants open each month and the seats per day; the
   panel gives him the tool to maintain it himself.
+
+## Cambios 2026-10-09 (Dani)
+
+Seven changes from his review of the demo, in the order he gave them. His
+words are quoted; nothing else was touched (the 19 / 80 / 99 amounts, the
+simulated payment note and the panel logic are as they were on 8 Oct).
+
+1. **Teléfono obligatorio.** "El teléfono pone OPCIONAL, necesito que sea
+   obligatorio ya que a través del teléfono les puedo mandar la ubicación de
+   donde estamos exactamente y también les envío la parte de teoría." The
+   phone field is now required in both languages, the "opcional" tag is
+   gone, the progress bar counts five fields, and the helper line under it
+   says why in his voice: "Por teléfono te mandamos la ubicación exacta de
+   donde estamos y la parte de teoría." / "By phone we send you the exact
+   location where we are and the theory material." Validation
+   (src/validators.js, telOk): an optional + and 9 to 15 digits once spaces,
+   dots, brackets and dashes are stripped; where libphonenumber recognises
+   the number it must also be a possible length for that country. The
+   control still prefixes the dial code, so "+34" alone fails and "+34" plus
+   a 9 digit Spanish number passes. Error text: "Escribe un teléfono
+   válido: 9 cifras si es español, con el prefijo del país si no lo es."
+2. **Letra, tamaño y colores de la web.** "Me gustaría que la letra, tamaño
+   y colores sean los de la web, para que no parezca que has entrado en
+   otro sitio distinto." Every value now comes from his own stylesheets,
+   fetched with curl on 2026-10-09 (the full table is at the top of
+   src/theme.css). Sources:
+   - Elementor global kit (colours, typography, buttons, inputs):
+     https://escuelanauticadevalencia.es/wp-content/uploads/elementor/css/post-33.css?ver=1791335683
+   - Home page: .../uploads/elementor/css/post-37.css?ver=1791336296
+   - Licencia page: .../uploads/elementor/css/post-1117.css?ver=1791342487
+   - Header template: .../uploads/elementor/css/post-408.css?ver=1791335684
+   - Theme base: .../themes/hello-elementor/style.min.css?ver=3.3.0
+   - Font: the Google Fonts link his pages carry (id google-fonts-1-css):
+     https://fonts.googleapis.com/css?family=Montserrat:100,...,900italic&display=swap
+     now linked from index.html the same way; the self hosted Inter and
+     Space Grotesk files are gone (src/fonts.css deleted).
+
+   Values taken, kit token to demo variable:
+   - primary #2FA4FF (buttons, links) -> --blue
+   - secondary #0E185F (button hover, dark bands, sticky header in
+     post-408.css) -> --navy, the header
+   - accent #0E185F (h1 to h6) -> headings
+   - text #6E6E6E -> --ink-soft, body text
+   - 2d6a869 #DADADA (input borders) -> --line
+   - 6b0ce64 #F3F3F3 (grey bands) -> --sand
+   - f2e50b6 #EEF7FF73 (light blue tint) -> --foam, used without the alpha
+   - #000739 (post-37.css, the darkest navy on the home page) -> --navy-deep
+   - #000000 (post-1117.css content text) -> --ink
+   - body background #fff (hello-elementor style.min.css) -> --white, body
+   - border-radius 7px (post-1117.css, the only rounded corner he uses) ->
+     --radius; buttons and inputs are square as in the kit
+   - typography: Montserrat throughout; body 18px / 1.5 (html font-size,
+     so every rem follows); h1 60px bold (45px at <=1024px, 35px at
+     <=767px); the panel headings use the kit's h4 (25/23/20px) and the
+     small headings its h5 (20/20/18px), the done title its h3 (35/30/23),
+     all bold; buttons use the kit "accent" style: 12px bold uppercase,
+     letter-spacing 2px, line-height 1.3, 2px border, padding 17px 37px,
+     primary fill turning secondary on hover; inputs 18px with a 2px
+     #DADADA border and 20px side padding.
+   - Not copied on purpose: the kit capitalises every word of h1 and h2;
+     the headings here read as sentences.
+3. **Nombre y apellidos en mayúsculas.** "Que el apartado de NOMBRE y
+   APELLIDOS salga en mayúsculas cuando lo escriban." Both fields uppercase
+   as you type (formatName in src/masks.js, the same mechanism as the ID
+   field; accents survive, "núria" becomes "NÚRIA"), the stored booking
+   keeps them uppercase, and every place a name is shown (recap, summary,
+   both emails, the panel, including the example bookings) passes through
+   the same function.
+4. **Logo de la escuela.** "Tiene que aparecer el logo de la escuela." His
+   header logo is the <img> his header template shows on every page:
+   https://escuelanauticadevalencia.es/wp-content/uploads/2025/01/ESCUELA-NAU-e1739526451490.png
+   (873 x 246 PNG, white wordmark with the coloured paper boat on a
+   transparent background). Copied unchanged to
+   public/logo-escuela-nautica-valencia.png and shown in the navy header of
+   the page and of the panel (alt text: the school name), and on a navy
+   band at the top of the two email mockups on the done screen, the way a
+   real mail from the school would carry it. His site icon
+   (cropped-ESCUELA-NAU-favicon-32x32.png and -192x192.png, same uploads
+   folder) replaced the anchor emoji as the tab icon. It is an image mark,
+   not a text one. The footer version (LOGO-NEGATIVO.png) returns 404 on
+   his site and was not used.
+5. **Sin el recuadro del precio.** "En la página de inicio, donde pone los
+   precios, el recuadro del PRECIO DEL CURSO lo quitaría." The "Precio del
+   curso 99 €" box is gone from the intro; "Señal al reservar 19 €" and
+   "Resto en el barco 80 €" stay. The checkout breakdown and both emails
+   still state the 99 € total as before.
+6. **Nueva descripción.** "Tu licencia en una mañana en Marina Port
+   Valencia, de 9 a 13h. Te llevas tu título al terminar." Replaces the lede
+   under the h1, verbatim. EN: "Your licence in one morning at Marina Port
+   Valencia, 9 to 13h. You take your certificate home when you finish."
+7. **Prácticas de seguridad y navegación.** "En requisitos: pone prácticas
+   de navegación y debe de poner 'prácticas de seguridad y navegación'."
+   The requirements line now reads "Completar 4 horas de prácticas de
+   seguridad y navegación" (src/data/licencia.js) and in English "4 hours of
+   safety and navigation practice". His own page still says "prácticas de
+   navegación"; worth changing there too.
+
+Checked before deploy: no inverted question mark and no dash character of
+any kind in the user facing strings (src/i18n.js, src/data/licencia.js);
+production build clean; the built page walked through in a browser (intro,
+form with the phone error, uppercase names, checkout, done screen with the
+logo band on both emails, panel).
 
 ## Running it
 
