@@ -115,7 +115,7 @@ export const messages = {
     'pay.tabCard': 'Tarjeta',
     'pay.tabBizum': 'Bizum',
     'pay.cardNumber': 'Número de tarjeta',
-    'pay.cardExpiry': 'Caducidad',
+    'pay.cardExpiry': 'Caduca',
     'pay.cardExpiryHint': 'mm/aa',
     'pay.cardCvc': 'CVC',
     'pay.cardCvcHint': 'Las 3 cifras del reverso.',

@@ -180,7 +180,7 @@ h2:focus, .ask:focus { outline: none; }
    clipped to "Cadu..." in the half-width card row at phone width. */
 .fld__input:focus ~ .fld__label,
 .fld__input:not(:placeholder-shown) ~ .fld__label,
-.fld.is-filled .fld__label { right: auto; width: calc((100% - 22px - 2.8rem) / .74); }
+.fld.is-filled .fld__label { right: auto; width: calc((100% - 22px - 1.6rem) / .74); }
 .fld__input:focus ~ .fld__label { color: var(--blue); }
 .fld__opt { margin-left: .4rem; font-size: .8em; }
 .fld__ok {
