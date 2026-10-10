@@ -4,16 +4,16 @@ import { parsePhoneNumberFromString } from 'libphonenumber-js';
    it can hand over on the day. type="email" accepts "pepe@gmail", the single
    most common real typo, so the email rule asks for a top level domain. */
 
-const NAME = /^[\p{L}\p{M}'’. ]+$/u;
+const NAME = /^[\p{L}\p{M}'’ ]+$/u;
 
 export const nombreOk = (v) => {
   const s = String(v).trim().replace(/\s+/g, ' ');
-  return s.length >= 2 && NAME.test(s);
+  return s.length >= 2 && s.length <= 60 && NAME.test(s);
 };
 
 export const apellidosOk = (v) => {
   const s = String(v).trim().replace(/\s+/g, ' ');
-  return s.length >= 2 && NAME.test(s);
+  return s.length >= 2 && s.length <= 60 && NAME.test(s);
 };
 
 /* The letter at the end of a Spanish DNI is a checksum: number mod 23 indexes
@@ -43,20 +43,43 @@ export function idCheck(v) {
 export const idOk = (v) => idCheck(v).ok;
 
 /* Required since 2026-10-09: Dani sends the exact meeting point and the
-   theory material by phone, so a booking without one is no use to him. The
-   rule is plausibility, not a registry lookup: an optional + and 9 to 15
-   digits once spaces, dots, brackets and dashes are removed. A Spanish
-   number is 9 digits; the control prefixes the dial code, so +34 plus 9
-   digits passes and a bare dial code ("+34") does not. Where libphonenumber
-   recognises the number it must also be a possible length for its country. */
+   theory material by phone, so a booking without one is no use to him. A
+   Spanish number is 9 digits starting with 6, 7, 8 or 9 (mobile or landline;
+   the control prefixes +34, which is stripped here). Any other country needs
+   its prefix and must be a possible number for that country according to
+   libphonenumber. A bare dial code ("+34") is "no phone". */
+const ES_NATIONAL = /^[6789]\d{8}$/;
+
 export const telOk = (v) => {
   const s = String(v).trim().replace(/[\s().-]/g, '');
   if (!/^\+?\d{9,15}$/.test(s)) return false;
-  try {
-    const p = parsePhoneNumberFromString(s, 'ES');
-    return p ? p.isPossible() : true;
-  } catch { return true; }
+  let p;
+  try { p = parsePhoneNumberFromString(s, 'ES'); } catch { p = undefined; }
+  const country = p?.country || (s.startsWith('+34') || !s.startsWith('+') ? 'ES' : '');
+  if (country === 'ES') {
+    const national = s.startsWith('+34') ? s.slice(3) : s.startsWith('0034') ? s.slice(4) : s;
+    return ES_NATIONAL.test(national);
+  }
+  return p ? p.isPossible() : false;
 };
+
+/* A day can be booked when it is a published session (open in the owner's
+   calendar), still ahead of today, and has a seat left. `today` is injected
+   so the rule can be tested. */
+export function dayCheck(iso, days = {}, bookings = [], today = localToday()) {
+  if (!iso || !/^\d{4}-\d{2}-\d{2}$/.test(String(iso))) return { ok: false, reason: 'none' };
+  if (iso <= today) return { ok: false, reason: 'past' };
+  const d = days[iso];
+  if (!d || !d.open) return { ok: false, reason: 'closed' };
+  const taken = bookings.filter((b) => b.day === iso && b.status !== 'cancelada').length;
+  if (d.seats - taken <= 0) return { ok: false, reason: 'full' };
+  return { ok: true, reason: '' };
+}
+
+function localToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
 
 const HTML5_EMAIL =
   /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
