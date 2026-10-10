@@ -15,7 +15,7 @@ Public side, three steps in Spanish (tú form), with an EN toggle:
    Each date card carries the hours (de 9 a 13 h), the place (Marina Port
    Valencia) and the seats left. Under the calendar: "Otras fechas: consulta
    por WhatsApp" linking to wa.me/34655487716. Months without dates say so.
-2. Tus datos. Nombre, Apellidos, Número de DNI/NIE o pasaporte, Correo
+2. Tus datos. Nombre, Apellidos, DNI, NIE o pasaporte, Correo
    electrónico, Teléfono (required since 9 Oct, see below). Nombre and
    Apellidos uppercase as you type. The ID field uppercases as you type,
    validates the DNI and NIE checksum letter, accepts a passport by shape

@@ -165,9 +165,13 @@ h2:focus, .ask:focus { outline: none; }
 .fld__input::placeholder { color: transparent; }
 .fld__input:focus-visible { outline: 3px solid var(--blue-bright); outline-offset: 2px; }
 .fld__input:focus { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(47,164,255,.15); }
+/* The label is bounded on the right (room for the tick) and never wraps: a
+   label longer than the box at phone width is clipped with an ellipsis inside
+   the input instead of folding onto a second line over the hint below. */
 .fld__label {
-  position: absolute; left: 22px; top: calc(1.3rem - .4rem); pointer-events: none;
-  font-size: 1rem; color: var(--ink-soft); transform-origin: left top;
+  position: absolute; left: 22px; right: 2.8rem; top: calc(1.3rem - .4rem); pointer-events: none;
+  font-size: 1rem; line-height: 1.3; color: var(--ink-soft); transform-origin: left top;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   transition: transform .18s cubic-bezier(.22,1,.36,1), color .18s;
 }
 .fld__input:focus ~ .fld__label,
