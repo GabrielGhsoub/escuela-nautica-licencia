@@ -175,6 +175,12 @@ h2:focus, .ask:focus { outline: none; }
 .fld__input:focus ~ .fld__label,
 .fld__input:not(:placeholder-shown) ~ .fld__label,
 .fld.is-filled .fld__label { transform: translateY(-.62rem) scale(.74); }
+/* Floated, the label is drawn at .74 scale but the ellipsis is decided on its
+   layout width, so the layout box grows by the same factor: "Caducidad" was
+   clipped to "Cadu..." in the half-width card row at phone width. */
+.fld__input:focus ~ .fld__label,
+.fld__input:not(:placeholder-shown) ~ .fld__label,
+.fld.is-filled .fld__label { right: auto; width: calc((100% - 22px - 2.8rem) / .74); }
 .fld__input:focus ~ .fld__label { color: var(--blue); }
 .fld__opt { margin-left: .4rem; font-size: .8em; }
 .fld__ok {
