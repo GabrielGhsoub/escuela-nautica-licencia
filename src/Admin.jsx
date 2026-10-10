@@ -7,6 +7,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { brand, course, school } from './data/licencia.js'
 import { formatName } from './masks.js'
+import { clampSeats } from './schema.js'
 import { loadBookings, loadDays, seatsLeft, setDay, setStatus, takesSeat } from './store.js'
 import { isPast, longDay, monthKey, monthName, todayIso } from './dates.js'
 import DayCalendar from './components/DayCalendar.jsx'
@@ -55,7 +56,7 @@ export default function Admin() {
   }
   function bump(iso, by) {
     const d = days[iso]
-    const seats = Math.min(12, Math.max(1, (d?.seats ?? course.capacity) + by))
+    const seats = clampSeats((d?.seats ?? course.capacity) + by)
     setDays(setDay(iso, { seats }))
   }
 

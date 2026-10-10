@@ -31,7 +31,8 @@ import { PhoneInput, defaultCountries, parseCountry } from 'react-international-
 import 'react-international-phone/style.css'
 import { brand, course, school } from './data/licencia.js'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
-import { apellidosOk, cardCvcOk, cardExpiryOk, cardNumberOk, emailOk, idCheck, nombreOk, telOk } from './validators.js'
+import { idCheck } from './validators.js'
+import { validateDatos, validatePago, validateDay } from './schema.js'
 import { formatCardNumber, formatCvc, formatExpiry, formatId, formatName, last4, maskId, prettyTel } from './masks.js'
 import { loadBookings, loadDays, seatsLeft, upsertBooking } from './store.js'
 import { isPast, longDay, monthKey, monthName, todayIso } from './dates.js'
@@ -47,6 +48,9 @@ const STEP_KEYS = ['steps.0', 'steps.1', 'steps.2']
 const BLANK = { nombre: '', apellidos: '', documento: '', email: '', telefono: '', telDisplay: '', policy: false }
 const BLANK_PAY = { method: 'tarjeta', number: '', expiry: '', cvc: '', name: '', bizumPhone: '' }
 const ORDER = ['nombre', 'apellidos', 'documento', 'email', 'telefono', 'policy']
+const PAY_KEYS = ['number', 'expiry', 'cvc', 'name', 'bizumPhone']
+/* ease-out, no overshoot anywhere */
+const QUICK = { type: 'tween', duration: 0.18, ease: 'easeOut' }
 const EASE = [0.22, 1, 0.36, 1]
 const MIN_MONTH = '2026-10'
 const MAX_MONTH = '2026-12'
@@ -100,6 +104,7 @@ export default function App() {
   const [showPayErrors, setShowPayErrors] = useState(false)
   const [sent, setSent] = useState(false)
   const [busy, setBusy] = useState(false)
+  const [dayError, setDayError] = useState('')
   const telRef = useRef(null)
 
   /* The calendar reads the same sessionStorage the panel writes, so a day the
@@ -120,44 +125,21 @@ export default function App() {
 
   const countries = lang === 'en' ? defaultCountries : COUNTRIES_ES
 
+  /* The zod schemas in schema.js are the authority; they answer with i18n
+     keys, translated here. idInfo only feeds the "Formato reconocido" hint. */
   const idInfo = useMemo(() => idCheck(form.documento), [form.documento])
-  const checks = useMemo(() => ({
-    nombre: nombreOk(form.nombre),
-    apellidos: apellidosOk(form.apellidos),
-    documento: idInfo.ok,
-    email: emailOk(form.email),
-    telefono: telOk(form.telefono),
-    policy: form.policy,
-  }), [form, idInfo])
-
-  const errors = {
-    nombre: checks.nombre ? '' : t('err.nombre'),
-    apellidos: checks.apellidos ? '' : t('err.apellidos'),
-    documento: checks.documento ? '' : t(`err.documento.${idInfo.reason || 'shape'}`),
-    email: checks.email ? '' : t('err.email'),
-    telefono: checks.telefono ? '' : t('err.telefono'),
-    policy: checks.policy ? '' : t('err.policy'),
-  }
+  const datos = useMemo(() => validateDatos(form), [form])
+  const checks = Object.fromEntries(ORDER.map((k) => [k, !datos.errors[k]]))
+  const errors = Object.fromEntries(ORDER.map((k) => [k, datos.errors[k] ? t(datos.errors[k]) : '']))
   /* Phone joined the required set on 2026-10-09: Dani sends the meeting
      point and the theory material through it. */
   const REQUIRED = ['nombre', 'apellidos', 'documento', 'email', 'telefono']
   const filled = REQUIRED.filter((k) => checks[k]).length
   const progress = Math.round((filled / REQUIRED.length) * 100)
 
-  const payChecks = {
-    number: cardNumberOk(pay.number),
-    expiry: cardExpiryOk(pay.expiry),
-    cvc: cardCvcOk(pay.cvc),
-    name: pay.name.trim().length >= 3,
-    bizumPhone: telOk(pay.bizumPhone) && pay.bizumPhone.replace(/\D/g, '').length > 3,
-  }
-  const payErrors = {
-    number: payChecks.number ? '' : t('err.cardNumber'),
-    expiry: payChecks.expiry ? '' : t('err.cardExpiry'),
-    cvc: payChecks.cvc ? '' : t('err.cardCvc'),
-    name: payChecks.name ? '' : t('err.cardName'),
-    bizumPhone: payChecks.bizumPhone ? '' : t('err.bizumPhone'),
-  }
+  const pago = useMemo(() => validatePago(pay), [pay])
+  const payChecks = Object.fromEntries(PAY_KEYS.map((k) => [k, !pago.errors[k]]))
+  const payErrors = Object.fromEntries(PAY_KEYS.map((k) => [k, pago.errors[k] ? t(pago.errors[k]) : '']))
 
   const ask = useRef(null)
   const inputs = useRef({})
@@ -195,8 +177,21 @@ export default function App() {
   }
 
   function pickDay(iso) {
+    setDayError('')
     setDay(iso)
     go(1)
+  }
+
+  /* The day is checked again at every submit against the live store: the
+     owner may have closed it, or the last seat may have gone, while the form
+     was open. The visitor goes back to the calendar with the reason. */
+  function dayStillOk() {
+    const r = validateDay(day, loadDays(), loadBookings())
+    if (r.ok) return true
+    setDayError(t(r.error))
+    setDay(null)
+    go(0)
+    return false
   }
 
   function submitDatos(e) {
@@ -209,6 +204,7 @@ export default function App() {
       el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
       return
     }
+    if (!dayStillOk()) return
     go(2)
   }
 
@@ -224,9 +220,7 @@ export default function App() {
       return
     }
     if (filedRef.current) return
-    /* The seat could have gone while the form was open (the owner closing the
-       day in the other view). Send the visitor back to the calendar. */
-    if (seatsLeft(day) === 0 && !filedIdRef.current) { setDay(null); go(0); return }
+    if (!filedIdRef.current && !dayStillOk()) return
     filedRef.current = true
     filedIdRef.current = upsertBooking(filedIdRef.current, {
       day,
@@ -251,6 +245,7 @@ export default function App() {
     setForm(BLANK)
     setPay(BLANK_PAY)
     setTouched({})
+    setDayError('')
     setShowErrors(false)
     setShowPayErrors(false)
   }
@@ -290,7 +285,11 @@ export default function App() {
         </header>
 
         <main className="shell main">
-          <section className="intro">
+          <m.section
+            className="intro"
+            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: EASE }}
+          >
             <h1>{t('intro.h1')}</h1>
             <p className="intro__lede">{t('intro.lede')}</p>
             <div className="intro__facts">
@@ -309,7 +308,7 @@ export default function App() {
                 <ul>{t('intro.reqList').map((r) => <li key={r}>{r}</li>)}</ul>
               </div>
             </div>
-          </section>
+          </m.section>
 
           <div className="swap">
           <AnimatePresence initial={false}>
@@ -322,11 +321,16 @@ export default function App() {
                 <p className="demo demo--lead">{t('done.demo')}</p>
                 <m.div
                   className="done__tick" aria-hidden="true"
-                  initial={{ scale: 0.3, rotate: -14, opacity: 0 }}
-                  animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 16, delay: 0.1 }}
+                  initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.3, ease: EASE }}
                 >
-                  ✓
+                  <svg viewBox="0 0 24 24" width="26" height="26">
+                    <m.path
+                      d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
+                      initial={{ pathLength: 0, opacity: 0 }} animate={{ pathLength: 1, opacity: 1 }}
+                      transition={{ pathLength: { duration: 0.45, ease: EASE, delay: 0.2 }, opacity: { duration: 0.1, delay: 0.2 } }}
+                    />
+                  </svg>
                 </m.div>
                 <h2 tabIndex={-1} ref={ask}>{t('done.h2')}</h2>
                 <p className="done__chip"><span className="chip chip--paid">{t('done.chip')}</span></p>
@@ -415,13 +419,7 @@ export default function App() {
                       className={i === step ? 'is-now' : i < step ? 'is-done' : ''}
                       aria-current={i === step ? 'step' : undefined}
                     >
-                      <m.span
-                        aria-hidden="true"
-                        animate={{ scale: i === step ? [0.6, 1] : 1 }}
-                        transition={{ type: 'spring', stiffness: 500, damping: 18 }}
-                      >
-                        {i < step ? '✓' : i + 1}
-                      </m.span>
+                      <span aria-hidden="true">{i < step ? '✓' : i + 1}</span>
                       {t(s)}
                       {i < step && <span className="visually-hidden">{t('steps.done')}</span>}
                     </li>
@@ -433,6 +431,17 @@ export default function App() {
                     {step === 0 && (
                       <div>
                         <h2 className="ask" tabIndex={-1} ref={ask}>{t('step0.h2')}</h2>
+                        <AnimatePresence>
+                          {dayError && (
+                            <m.p
+                              key="dayerr" className="fld__err day__err" role="alert"
+                              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                              transition={QUICK}
+                            >
+                              {dayError}
+                            </m.p>
+                          )}
+                        </AnimatePresence>
                         <div className="pick">
                           <DayCalendar
                             month={month} onMonth={setMonth} minMonth={MIN_MONTH} maxMonth={MAX_MONTH}
@@ -453,8 +462,8 @@ export default function App() {
                                         onClick={() => pickDay(iso)}
                                         initial={{ opacity: 0, y: 12 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: i * 0.045, duration: 0.34, ease: EASE }}
-                                        whileHover={left > 0 ? { y: -3 } : undefined}
+                                        transition={{ delay: i * 0.045, duration: 0.34, ease: EASE, scale: QUICK }}
+                                        whileHover={left > 0 ? { scale: 1.01 } : undefined}
                                         whileTap={left > 0 ? { scale: 0.98 } : undefined}
                                       >
                                         <strong>{longDay(iso, lang)}</strong>
@@ -532,7 +541,7 @@ export default function App() {
                           valid={checks.email}
                           error={errors.email} showError={showErr('email')}
                           onChange={(e) => setForm({ ...form, email: e.target.value })}
-                          onBlur={blur('email')}
+                          onBlur={() => { setForm((f) => ({ ...f, email: f.email.trim().toLowerCase() })); blur('email')() }}
                           name="email" type="email" inputMode="email" autoComplete="email" enterKeyHint="next"
                         />
 
@@ -610,8 +619,17 @@ export default function App() {
                         </p>
                         <div className="nav">
                           <button type="button" className="btn btn--ghost" onClick={() => go(0)}>{t('nav.back')}</button>
-                          <button type="submit" className="btn btn--primary">{t('nav.continue')}</button>
+                          <button type="submit" className="btn btn--primary" disabled={!datos.ok} aria-describedby={!datos.ok && Object.keys(touched).length ? 'nav-hint' : undefined}>
+                            {t('nav.continue')}
+                          </button>
                         </div>
+                        <AnimatePresence>
+                          {!datos.ok && Object.keys(touched).some((k) => !k.startsWith('pay.')) && (
+                            <m.p key="hint" id="nav-hint" className="nav__hint" aria-live="polite" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={QUICK}>
+                              {t('nav.incomplete')}
+                            </m.p>
+                          )}
+                        </AnimatePresence>
                       </form>
                     )}
 
@@ -715,7 +733,7 @@ export default function App() {
 
                         <div className="nav">
                           <button type="button" className="btn btn--ghost" onClick={() => go(1)}>{t('nav.back')}</button>
-                          <button type="submit" className="btn btn--primary">
+                          <button type="submit" className="btn btn--primary" disabled={!pago.ok}>
                             {pay.method === 'bizum' ? t('nav.payBizum') : t('nav.pay')}
                           </button>
                         </div>

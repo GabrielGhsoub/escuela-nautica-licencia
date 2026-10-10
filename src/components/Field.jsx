@@ -47,10 +47,10 @@ const Field = forwardRef(function Field(
           {valid && !bad && (
             <m.span
               className="fld__ok" aria-hidden="true"
-              initial={{ opacity: 0, scale: .5 }}
+              initial={{ opacity: 0, scale: .8 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: .5 }}
-              transition={{ type: 'spring', stiffness: 500, damping: 22 }}
+              exit={{ opacity: 0, scale: .8 }}
+              transition={{ type: 'tween', duration: .18, ease: 'easeOut' }}
             >
               ✓
             </m.span>
@@ -62,8 +62,8 @@ const Field = forwardRef(function Field(
           {bad ? (
             <m.p
               key="err" id={`err-${id}`} className="fld__err"
-              initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
-              transition={{ duration: .16 }}
+              initial={{ opacity: 0, y: -2 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+              transition={{ duration: .18, ease: 'easeOut' }}
             >
               {error}
             </m.p>
@@ -71,7 +71,7 @@ const Field = forwardRef(function Field(
             <m.p
               key="hint" id={`hint-${id}`} className="fld__hint"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: .16 }}
+              transition={{ duration: .18, ease: 'easeOut' }}
             >
               {hint}
             </m.p>

@@ -50,10 +50,11 @@ body { background: var(--white); color: var(--ink-soft); font-family: var(--body
 .page .btn--ghost { background: #fff; border-color: var(--line); color: var(--navy); }
 .page .btn--ghost:hover { background: var(--foam); border-color: var(--blue); }
 .page .btn[disabled] { opacity: .45; cursor: not-allowed; }
-.page .btn[disabled]:hover { transform: none; }
+.page .btn[disabled]:hover, .page .btn[disabled]:active { transform: none; }
 
 .done { text-align: center; }
-.done__tick { width: 50px; height: 50px; margin: 0 auto 1rem; border-radius: 999px; background: var(--blue); color: #fff; display: grid; place-items: center; font-size: 1.4rem; }
+.done__tick { width: 50px; height: 50px; margin: 0 auto 1rem; border-radius: 999px; background: var(--blue); color: #fff; display: grid; place-items: center; }
+.done__tick svg { display: block; }
 .done h2 { font-family: var(--display); font-size: var(--h3); font-weight: 700; line-height: 1.5; color: var(--navy); margin: 0 0 .5rem; }
 .done__what { font-size: 1.02rem; margin: 0 0 .6rem; }
 .done__note { color: var(--ink-soft); font-size: .94rem; max-width: 52ch; margin: 0 auto 1.4rem; }
@@ -76,9 +77,6 @@ h2:focus, .ask:focus { outline: none; }
    alone, and in the footer by brightness alone at 1.52:1. */
 .foot a, .privacidad a, .pick__other a, .check a { text-decoration: underline; }
 
-.done { animation: rise .32s cubic-bezier(.22,1,.36,1) both; }
-@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .done { animation: none; } }
 
 /* Links were 17-25px tall: the header phone, the footer phone and email, and
    the footer links. On a phone-first page the tel: link is the one control that
@@ -106,19 +104,19 @@ h2:focus, .ask:focus { outline: none; }
 
 
 @keyframes card-in { from { opacity: 0; transform: translateY(12px); } }
-.steps li span { transition: background .25s, color .25s; }
-.steps li.is-done span, .steps li.is-now span { animation: pop .35s cubic-bezier(.34,1.56,.64,1); }
-@keyframes pop { from { transform: scale(.4); } }
-
-.done__tick { animation: tick-in .5s cubic-bezier(.34,1.56,.64,1) .1s backwards; }
-@keyframes tick-in { from { opacity: 0; transform: scale(.3) rotate(-12deg); } }
+.steps li span { transition: background .2s ease-out, color .2s ease-out; }
+.steps li.is-done span, .steps li.is-now span { animation: pop .22s ease-out; }
+@keyframes pop { from { transform: scale(.85); opacity: .6; } }
 
 
-@keyframes err-in { from { opacity: 0; transform: translateY(-4px); } }
-@keyframes nudge { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 
-.page .btn { transition: transform .16s, background .2s, border-color .2s, box-shadow .2s; }
-.page .btn:active { transform: translateY(0) scale(.97); }
+
+/* hover and press: a 1% lift and a 2% press, 180 ms ease-out, no lift on the Y axis */
+.page .btn { transition: transform .18s ease-out, background .2s ease-out, border-color .2s ease-out, box-shadow .2s ease-out; }
+.page .btn:hover { transform: scale(1.01); }
+.page .btn:active { transform: scale(.98); }
+.cal__arrow, .seats__btn, .tabs button, .top__lang button, .adm__dayrow { transition: transform .18s ease-out, background .18s ease-out, border-color .18s ease-out, color .18s ease-out; }
+.cal__arrow:active:not([disabled]), .seats__btn:active, .tabs button:active, .adm__dayrow:active:not([disabled]) { transform: scale(.98); }
 
 .done__admin { font-size: .94rem; margin: 0 auto 1.4rem; }
 .done__admin a { color: var(--navy); font-weight: 600; text-decoration: underline; }
@@ -187,6 +185,8 @@ h2:focus, .ask:focus { outline: none; }
 .fld__foot { display: grid; min-height: 1.7rem; padding: .3rem .2rem 0; }
 .fld__hint { margin: 0; font-size: .78rem; color: var(--ink-soft); }
 .fld__err { margin: 0; font-size: .78rem; font-weight: 600; color: #b3261e; }
+.day__err { margin: 0 0 1rem; font-size: .9rem; }
+.nav__hint { margin: .6rem 0 0; font-size: .78rem; color: var(--ink-soft); text-align: right; }
 .fld.is-bad .fld__input { border-color: #b3261e; background: #fffafa; }
 .fld.is-bad .fld__label { color: #b3261e; }
 
@@ -254,13 +254,13 @@ h2:focus, .ask:focus { outline: none; }
 
 /* Entrance only, and purely decorative: the panel's resting state is visible, so
    a tab backgrounded mid-transition can never come back to an invisible form. */
-.stp { animation: stp-in .3s cubic-bezier(.22,1,.36,1); }
+.stp { animation: stp-in .26s cubic-bezier(.22,1,.36,1); }
 .stp--back { animation-name: stp-back; }
 /* Transform only, never opacity. A paused or throttled animation holds its first
    keyframe, so fading in from 0 would leave a backgrounded tab showing an
    invisible form. Sliding from 34px is still fully legible at every frame. */
-@keyframes stp-in { from { transform: translateX(34px); } }
-@keyframes stp-back { from { transform: translateX(-34px); } }
+@keyframes stp-in { from { transform: translateX(18px); } }
+@keyframes stp-back { from { transform: translateX(-18px); } }
 
 /* --- ES/EN toggle. It sits in the navy header next to the phone link and
    borrows the header's own contrast: a quiet pill, white fill on the language
@@ -313,11 +313,12 @@ h2:focus, .ask:focus { outline: none; }
 .cal__wd { display: grid; grid-template-columns: repeat(7, 1fr); font-size: .72rem; font-weight: 600; color: var(--ink-soft); text-align: center; margin-bottom: .25rem; }
 .cal__grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
 .cal__blank { aspect-ratio: 1; }
-.cal__day { aspect-ratio: 1; min-height: 40px; display: grid; place-items: center; align-content: center; gap: 1px; padding: 0; border: 1px solid transparent; border-radius: var(--radius); background: none; font: 500 .9rem var(--body); color: var(--ink-soft); cursor: default; transition: background .15s, border-color .15s, transform .15s; }
+.cal__day { aspect-ratio: 1; min-height: 40px; display: grid; place-items: center; align-content: center; gap: 1px; padding: 0; border: 1px solid transparent; border-radius: var(--radius); background: none; font: 500 .9rem var(--body); color: var(--ink-soft); cursor: default; transition: background .18s ease-out, border-color .18s ease-out, transform .18s ease-out; }
 .cal__day .cal__num { line-height: 1; }
 .cal__day .cal__seats { font-size: .62rem; font-weight: 700; line-height: 1; }
 .cal__day.is-open { background: var(--foam); color: var(--navy); border-color: rgba(47,164,255,.35); cursor: pointer; font-weight: 700; }
-.cal__day.is-open:not([disabled]):hover { background: #dcebfa; transform: translateY(-1px); }
+.cal__day.is-open:not([disabled]):hover { background: #dcebfa; transform: scale(1.01); }
+.cal__day.is-open:not([disabled]):active { transform: scale(.98); }
 .cal__day.is-open .cal__seats { color: var(--blue); }
 .cal__day.is-full { background: #f3f3f1; color: var(--ink-soft); border-color: var(--line); cursor: not-allowed; }
 .cal__day.is-full .cal__seats { color: #8a5a17; font-size: .56rem; }
@@ -339,7 +340,7 @@ h2:focus, .ask:focus { outline: none; }
 
 .pick__list h3 { font-family: var(--display); font-size: var(--h5); font-weight: 700; margin: 0 0 .7rem; color: var(--navy); }
 .dates { display: grid; gap: .6rem; }
-.date { font: inherit; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: .9rem 1rem; cursor: pointer; display: grid; gap: .15rem; transition: border-color .15s, box-shadow .15s, transform .15s; }
+.date { font: inherit; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: .9rem 1rem; cursor: pointer; display: grid; gap: .15rem; transition: border-color .18s ease-out, box-shadow .18s ease-out; }
 .date:hover:not([disabled]) { border-color: var(--blue); box-shadow: var(--shadow); }
 .date.is-on { border-color: var(--blue); background: var(--foam); box-shadow: 0 0 0 2px var(--blue) inset; }
 .date.is-full { background: #f6f6f4; cursor: not-allowed; }
