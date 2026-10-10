@@ -226,10 +226,66 @@ production build clean; the built page walked through in a browser (intro,
 form with the phone error, uppercase names, checkout, done screen with the
 logo band on both emails, panel).
 
+## Cambios 2026-10-10
+
+Dos entradas: el aviso de Dani desde el móvil y, después, la revisión
+general del formulario (validación completa y animaciones más sobrias).
+
+1. **Etiqueta del documento más corta.** Dani, 10 Oct 15:51 desde el móvil:
+   la etiqueta "Número de DNI/NIE o pasaporte" no cabía en el campo y se
+   montaba sobre la línea de ayuda. Ahora dice "DNI, NIE o pasaporte" (EN:
+   "ID, NIE or passport"). Además la etiqueta flotante de todos los campos
+   queda acotada dentro de su caja (src/app.css, .fld__label): nunca salta a
+   una segunda línea; si algún día un texto no cupiera, se recorta con puntos
+   suspensivos dentro del campo. Comprobado con Playwright a 360 y 390 px en
+   los cinco campos y en los dos idiomas.
+2. **Validación con esquemas (zod).** Cada campo se valida al salir de él y
+   al enviar, con un mensaje claro debajo (src/schema.js, mensajes en
+   src/i18n.js):
+   - Nombre y apellidos: letras con acentos, espacios y apóstrofos, de 2 a 60
+     caracteres; siguen saliendo en mayúsculas al escribir.
+   - DNI, NIE o pasaporte: letra de control real del DNI (número módulo 23),
+     NIE X/Y/Z + 7 cifras + letra con la misma comprobación, pasaporte de 6 a
+     12 letras o cifras. La línea de ayuda dice qué formato ha reconocido.
+   - Correo: se recorta y pasa a minúsculas al salir del campo; pide un
+     dominio completo (pepe@gmail no vale).
+   - Teléfono (obligatorio, como pidió el 9 Oct): español de 9 cifras que
+     empiece por 6, 7, 8 o 9; de otro país, con su prefijo y una longitud
+     posible para ese país (libphonenumber).
+   - Día: al continuar y al pagar se vuelve a comprobar contra el calendario
+     vivo que el día sigue abierto, no ha pasado y le queda plaza; si no, el
+     alumno vuelve al calendario con el motivo ("Ese día se ha completado
+     mientras rellenabas el formulario. Elige otro.").
+   - Casilla de la política de reservas: obligatoria.
+   - Panel: las plazas por día quedan entre 1 y 12, número entero.
+   El botón Continuar (y Pagar en el paso 3) está desactivado hasta que todo
+   es válido, con una línea discreta que lo explica. Los errores llevan
+   aria-invalid y aria-describedby para lectores de pantalla.
+3. **Animaciones más sobrias (motion, la librería de Framer Motion).** Sin
+   rebotes ni muelles en ningún sitio: entrada de la página y del panel con
+   un fundido y 12 px de subida; transición entre pasos de 18 px; botones y
+   días del calendario con hover al 101 % y pulsación al 98 % en 180 ms
+   (ease-out); errores que aparecen con un fundido; en la pantalla final la
+   marca de verificación se dibuja en 450 ms, sin confeti. Si el sistema
+   tiene activado "reducir movimiento", no hay entrada animada.
+4. **Tests y comprobaciones.** `npm test` (tests/validators.test.mjs, 10
+   casos: letras de control de DNI y NIE, pasaportes, teléfonos españoles y
+   extranjeros, días pasados/cerrados/completos, correo, nombres, tarjeta,
+   Bizum, plazas) y `npm run lint:strings` (ningún guion ni signo de
+   interrogación invertido en los textos). `npm run check` lanza los dos.
+5. **Tamaño del bundle.** Antes: 476,7 kB (143,8 kB gzip). Después: 496,5
+   kB (149,9 kB gzip); la validación usa zod/mini para que el coste sea de
+   6 kB comprimidos.
+
+Sin tocar: marca (Montserrat, colores, logo), señal de 19 € y 80 € en el
+barco, teléfono obligatorio y su línea de ayuda, nombres en mayúsculas, sin
+recuadro de "Precio del curso", y el resto de los siete cambios del 9 Oct.
+
 ## Running it
 
     npm install
     npm run dev        # http://localhost:5173/escuela-nautica-licencia/
+    npm run check      # string linter + validator tests
     npm run build      # dist/
     npm run preview
 

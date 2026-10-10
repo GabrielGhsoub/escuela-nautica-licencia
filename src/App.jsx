@@ -25,7 +25,7 @@
    través del teléfono les puedo mandar la ubicación de donde estamos
    exactamente y también les envío la parte de teoría", so it is required. */
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { AnimatePresence, LazyMotion, MotionConfig, domAnimation } from 'motion/react'
+import { AnimatePresence, LazyMotion, MotionConfig, domAnimation, useReducedMotion } from 'motion/react'
 import * as m from 'motion/react-m'
 import { PhoneInput, defaultCountries, parseCountry } from 'react-international-phone'
 import 'react-international-phone/style.css'
@@ -83,6 +83,9 @@ const eur = (n) => `${n} €`
 
 export default function App() {
   const { lang, t } = useLang()
+  /* MotionConfig already drops transforms for people who asked for less
+     motion; this also skips the entrance fades, so the page is simply there. */
+  const reduce = useReducedMotion()
   const [view, setView] = useState(() => (window.location.hash === '#admin' ? 'admin' : 'site'))
   useEffect(() => {
     const onHash = () => setView(window.location.hash === '#admin' ? 'admin' : 'site')
@@ -287,7 +290,7 @@ export default function App() {
         <main className="shell main">
           <m.section
             className="intro"
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+            initial={reduce ? false : { opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, ease: EASE }}
           >
             <h1>{t('intro.h1')}</h1>
