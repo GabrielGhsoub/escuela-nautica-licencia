@@ -238,7 +238,11 @@ general del formulario (validación completa y animaciones más sobrias).
    queda acotada dentro de su caja (src/app.css, .fld__label): nunca salta a
    una segunda línea; si algún día un texto no cupiera, se recorta con puntos
    suspensivos dentro del campo. Comprobado con Playwright a 360 y 390 px en
-   los cinco campos y en los dos idiomas.
+   los cinco campos y en los dos idiomas. Revisión del mismo día: la etiqueta
+   flotante se dibuja a escala .74 pero el recorte se decidía con su ancho
+   sin escalar, y "Caducidad" salía como "Cadu..." en la fila de la tarjeta a
+   390 px; la caja flotante crece por ese factor y la etiqueta pasa a
+   "Caduca" (EN "Expiry").
 2. **Validación con esquemas (zod).** Cada campo se valida al salir de él y
    al enviar, con un mensaje claro debajo (src/schema.js, mensajes en
    src/i18n.js):
